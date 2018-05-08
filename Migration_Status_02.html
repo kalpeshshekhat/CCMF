@@ -43,8 +43,7 @@ function applyFilters() {
 		//demo1.innerHTML = '';
 		var startDate = document.getElementById("fromdate").value;
 		var endDate = document.getElementById("todate").value;
-		//alert(startDate);
-		//alert(endDate);
+		
 		var dateMove = new Date(startDate);
 		var strDate = startDate;
 		while (strDate < endDate){
@@ -79,7 +78,7 @@ function applyFilters() {
 				accessKeyId: "AKIAI35YVDRTSJ47FJZA",
 				secretAccessKey: "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"
 			});
-			
+
 			var params = {
 				Filters: [
 				{
