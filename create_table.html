@@ -1,0 +1,71 @@
+<html>
+<head>
+
+
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+
+
+<script>
+	AWS.config.update({
+		region: "us-east-1",
+		endpoint: "https://dynamodb.us-east-1.amazonaws.com",
+		accessKeyId: "AKIAI35YVDRTSJ47FJZA",
+		secretAccessKey: "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"
+	});
+
+
+// declaring dynamodb variable & assigning in it the Dynamodb function of AWS class
+
+
+var dynamodb = new AWS.DynamoDB();
+
+
+
+// function to create a table
+
+
+function createTable() {
+	var params = {
+		TableName : "ec2data",
+		KeySchema: [
+			{ AttributeName: "LaunchTime", KeyType: "HASH"},
+			{ AttributeName: "Value", KeyType: "RANGE"}
+		],
+		AttributeDefinitions: [
+			{ AttributeName: "LaunchTime", AttributeType: "S" },
+			{ AttributeName: "Value", AttributeType: "S" }
+		],
+		ProvisionedThroughput: {
+			ReadCapacityUnits: 5,
+			WriteCapacityUnits: 5
+		}
+	};
+	
+	dynamodb.createTable(params, function(err, data) {
+		if (err) {
+			document.getElementById('textarea').innerHTML = "Unable to create table: " + "\n" + JSON.stringify(err, undefined, 2);
+		} else {
+			document.getElementById('textarea').innerHTML = "Created table: " + "\n" + JSON.stringify(data, undefined, 2);
+		}
+
+	});
+	
+}
+
+</script>
+</head>
+
+
+
+
+
+
+<body>
+<input id="createTableButton" type="button" value="Create Table" onclick="createTable();" />
+<br><br>
+<textarea readonly id= "textarea" style="width:400px; height:800px"></textarea>
+</body>
+</html>
+
+

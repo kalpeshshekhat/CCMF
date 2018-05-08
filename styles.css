@@ -1,0 +1,30 @@
+body {
+	background-color: powderblue;
+}
+h3 {
+	text-align: center;
+	color: blue;
+}
+
+div {
+	margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+
+}
+
+.css-grid1{
+	display: grid;
+	size: 
+}
+
+.css-inlineblock1{
+	display: inline-block;
+}
+
+.css-button{
+	float: right;
+	width: auto;
+}
+
+

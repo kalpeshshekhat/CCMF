@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Migration Status</title>
+	<!--<link rel="stylesheet" href="styles.css">-->
+<div>
+	<h3> M I G R A T I O N  -  S T A T U S </h3>
+</div>
+	<meta charset="utf-8">
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.208.0.min.js"></script>
+</head>
+
+<body>
+	<p>Select Filters to get your ec2 graph :</p>
+	<form>
+		
+		<div class = "css-grid1">
+			<label> Launch-time: </label>
+		</div>
+
+		<div class = "css-inlineblock1">
+			<label for="fromdate">From Date:</label>
+			<input type="date" id="fromdate" name="fromdate" min="2017-01-01">
+			<label for="todate">To Date:</label>
+			<input type="date" id="todate" name="todate">
+		</div>
+
+		<div class = "css-button">
+			<input type="submit" id="sbmt" onclick="applyFilters(); return false;">
+		</div>
+
+		<div id="demo1"></div>
+		<div id="demo2"></div>
+		<div id="demo3"></div>
+		<div id="demo4"></div>
+		<div id="demo5"></div>
+		<div id="demo6"></div>
+		<div id="demo7"></div>
+		<div id="demo8"></div>
+
+	</form>	
+
+<script>
+	
+	function applyFilters() {
+
+		var listDate = [];
+		demo1.innerHTML = '';
+
+		var startDate = document.getElementById("fromdate").value;
+		var endDate = document.getElementById("todate").value;	
+		//alert(startDate);
+		//alert(endDate);
+
+		var dateMove = new Date(startDate);
+		//alert(dateMove);
+
+		var strDate = startDate;
+		//alert(strDate);
+
+
+		while (strDate < endDate){
+  			var strDate = dateMove.toISOString().slice(0,10);
+  			listDate.push(strDate + '*');
+  			dateMove.setDate(dateMove.getDate()+1);
+		};
+
+		//alert(listDate);
+
+		document.getElementById('demo1').innerHTML = "Your selected dates are";
+		demo2.innerHTML += "<br>";
+		document.getElementById('demo3').innerHTML = listDate;
+
+		//return listDate;
+
+		AWS.config.update({
+			region: "us-east-1",
+			accessKeyId: "AKIAI35YVDRTSJ47FJZA",
+			secretAccessKey: "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"
+		});
+
+		var ec2 = new AWS.EC2();
+
+		var params = {
+			Filters: [
+			{
+				Name: 'launch-time',
+				Values: listDate
+			}]
+		};
+
+		ec2.describeInstances(params, function(err, data) {
+			if (err) {
+				demo5.innerHTML = 'ERROR:' + err;
+			} else {
+				var no_of_inst = data.Reservations.length;
+				demo4.innerHTML += "<br>";
+				document.getElementById('demo5').innerHTML = "Instances migrated during above dates are: " + no_of_inst;
+			}
+		});
+			
+		
+
+
+
+	
+		
+	}
+	
+	
+
+
+	</script>
+</body>
+</html>

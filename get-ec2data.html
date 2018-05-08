@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AWS EC2 Instances</title>
+    <h2>Display list of EC2 Instances</h2>
+    <meta charset="utf-8">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.208.0.min.js"></script>
+</head>
+<body>
+    <p>Click button to get instances list.</p>
+    <button id="list-instances">List Instances</button>
+    <hr>
+    <div id="result1"></div>
+
+    <script>
+	AWS.config.update({
+		region: "us-east-1",
+		accessKeyId: "AKIAI35YVDRTSJ47FJZA",
+		secretAccessKey: "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"
+	});
+
+	var ec2 = new AWS.EC2();
+
+	var button = document.getElementById('list-instances');
+
+	button.addEventListener('click', function () {
+		result1.innerHTML = '';
+		var params = {
+                Filters: [
+                {
+                    Name: 'tag:os',
+                    Values: [
+                      'win',
+                    ]
+                }
+
+            ]};
+                    
+            ec2.describeInstances(params, function(err, data) {
+                if (err) {
+                result1.innerHTML = 'ERROR: ' + err; // an error occurred
+                } else {
+                	//var ec2data = data;
+                	//var ec2data = JSON.stringify(data, null, 2);
+                	document.getElementById('result1').innerHTML = data.Reservations.length + 1;
+                	//return ec2data;
+                }
+            });
+
+                
+        }); 
+
+    </script>
+</body>
+</html>           

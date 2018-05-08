@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+	
+var listDate = [];
+var startDate ='2017-02-01';
+var endDate = '2017-02-10';
+
+alert(startDate);
+alert(endDate);
+
+var dateMove = new Date(startDate);
+alert(dateMove);
+
+var strDate = startDate;
+alert(strDate);
+
+while (strDate < endDate){
+  var strDate = dateMove.toISOString().slice(0,10);
+  listDate.push(strDate);
+  dateMove.setDate(dateMove.getDate()+1);
+};
+alert(listDate);
+
+</script>
+</body>
+</html>

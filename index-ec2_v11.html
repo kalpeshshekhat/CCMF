@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AWS EC2 Instances</title>
+    <h2>Display list of EC2 Instances</h2>
+    <meta charset="utf-8">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.208.0.min.js"></script>
+</head>
+<body>
+    <p>Click button to get instances list.</p>
+    <button id="list-instances">List Instances</button>
+    <hr>
+    <div id="result1"></div>
+    <div id="result2"></div>
+    <div id="result3"></div>
+    <div id="line1"></div>
+    <div id="result4"></div>
+    <div id="result5"></div>
+    <div id="result6"></div>
+    <div id="line2"></div>
+    <div id="result7"></div>
+    <div id="result8"></div>
+    <div id="result9"></div>
+    <div id="line3"></div>
+    <div id="result10"></div>
+    <div id="result11"></div>
+    <div id="result12"></div>
+    <div id="fb-root"></div>
+    <script type="text/javascript">
+        var appId = '411033949339972' ;
+        var roleArn = 'arn:aws:iam::819767472078:role/jsapp-role' ;
+        var bucketName = 'jsapp-v1';
+        AWS.config.region = 'us-east-1' ;
+        var ec2 = new AWS.EC2();
+        var fbUserId;
+        var button = document.getElementById('list-instances');
+        var result1 = document.getElementById('result1');
+        var result2 = document.getElementById('result2');
+        var result3 = document.getElementById('result3');
+        var result4 = document.getElementById('result4');
+        var result5 = document.getElementById('result5');
+        var result6 = document.getElementById('result6');
+        var result7 = document.getElementById('result7');
+        var result8 = document.getElementById('result8');
+        var result9 = document.getElementById('result9');
+        var result10 = document.getElementById('result10');
+        var result11 = document.getElementById('result11');
+        var result12 = document.getElementById('result12');
+
+        button.addEventListener('click', function () {
+            //Object key will be facebook-USERID#/FILE_NAME
+            var objKey = 'facebook-' + fbUserId;
+            result1.innerHTML = '';
+            result2.innerHTML = '';
+            result3.innerHTML = '';
+            result4.innerHTML = '';
+            result5.innerHTML = '';
+            result6.innerHTML = '';
+            result7.innerHTML = '';
+            result8.innerHTML = '';
+            result9.innerHTML = '';
+            result10.innerHTML = '';
+            result11.innerHTML = '';
+            result12.innerHTML = '';
+            line1.innerHTML = '';
+            line2.innerHTML = '';
+            line3.innerHTML = '';
+            var params = {
+                Filters: [
+                {
+                    Name: 'tag:app',
+                    Values: [
+                      'web',
+                    ]
+                }
+
+            ]};
+                    
+            ec2.describeInstances(params, function(err, data) {
+                if (err) {
+                result1.innerHTML = 'ERROR: ' + err; // an error occurred
+                } else {
+                    
+                    result1.innerHTML = 'InstanceId  :  ' + JSON.stringify(data.Reservations[0].Instances[0].InstanceId);
+                    result2.innerHTML = 'PrivateIpAddress  :  ' + JSON.stringify(data.Reservations[0].Instances[0].PrivateIpAddress);
+                    result3.innerHTML = 'LaunchTime  :  ' + JSON.stringify(data.Reservations[0].Instances[0].LaunchTime);
+                    
+                    line1.innerHTML += "<br>";
+
+                    result4.innerHTML = 'InstanceId  :  ' + JSON.stringify(data.Reservations[1].Instances[0].InstanceId);
+                    result5.innerHTML = 'PrivateIpAddress  :  ' + JSON.stringify(data.Reservations[1].Instances[0].PrivateIpAddress);
+                    result6.innerHTML = 'LaunchTime  :  ' + JSON.stringify(data.Reservations[1].Instances[0].LaunchTime);
+                    
+                    line2.innerHTML += "<br>";
+
+                    result7.innerHTML = 'InstanceId  :  ' + JSON.stringify(data.Reservations[2].Instances[0].InstanceId);
+                    result8.innerHTML = 'PrivateIpAddress  :  ' + JSON.stringify(data.Reservations[2].Instances[0].PrivateIpAddress);
+                    result9.innerHTML = 'LaunchTime  :  ' + JSON.stringify(data.Reservations[2].Instances[0].LaunchTime);
+                    
+                    line3.innerHTML += "<br>";
+
+                    result10.innerHTML = 'InstanceId  :  ' + JSON.stringify(data.Reservations[3].Instances[0].InstanceId);
+                    result11.innerHTML = 'PrivateIpAddress  :  ' + JSON.stringify(data.Reservations[3].Instances[0].PrivateIpAddress); 
+                    result12.innerHTML = 'LaunchTime  :  ' + JSON.stringify(data.Reservations[3].Instances[0].LaunchTime);
+                    
+                }
+                });
+            })
+
+         /*!
+         * Login to your application using Facebook.
+         * Uses the Facebook SDK for JavaScript available here:
+         * https://developers.facebook.com/docs/javascript/quickstart/
+         */
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: appId
+            });
+
+            FB.login(function (response) {
+                ec2.config.credentials = new AWS.WebIdentityCredentials({
+                    ProviderId: 'graph.facebook.com',
+                    RoleArn: roleArn,
+                    WebIdentityToken: response.authResponse.accessToken
+                });
+                fbUserId = response.authResponse.userID;
+                button.style.display = 'block';
+            })
+        };
+
+         // Load the Facebook SDK asynchronously
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://connect.facebook.net/en_US/all.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+</body>
+</html>

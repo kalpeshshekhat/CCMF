@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AWS EC2 Instances</title>
+    <h2>Display list of EC2 Instances</h2>
+    <meta charset="utf-8">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.208.0.min.js"></script>
+</head>
+<body>
+    <p>Click button to get instances list.</p>
+    <button id="list-instances">List Instances</button>
+    <div id="result1"></div>
+    <div id="result2"></div>
+    <div id="fb-root"></div>
+    <script type="text/javascript">
+        var appId = '411033949339972' ;
+        var roleArn = 'arn:aws:iam::819767472078:role/jsapp-role' ;
+        var bucketName = 'jsapp-v1';
+        AWS.config.region = 'us-east-1' ;
+        var ec2 = new AWS.EC2();
+        var fbUserId;
+        var button = document.getElementById('list-instances');
+        var result1 = document.getElementById('result1');
+        var result2 = document.getElementById('result2');
+
+        button.addEventListener('click', function () {
+            //Object key will be facebook-USERID#/FILE_NAME
+            var objKey = 'facebook-' + fbUserId;
+            result1.innerHTML = '';
+            result2.innerHTML = '';
+            var params = {
+                Filters: [
+                {
+                    Name: 'tag:app',
+                    Values: [
+                      'web',
+                    ]
+                }]
+                };
+                    
+            ec2.describeInstances(params, function(err, data) {
+                if (err) {
+                result1.innerHTML = 'ERROR: ' + err; // an error occurred
+                } else {
+                    result1.innerHTML = JSON.stringify(data.Reservations[0].Instances[0].InstanceId);
+                    result2.innerHTML = JSON.stringify(data.Reservations[0].Instances[0].PrivateIpAddress);
+                }
+                });
+            })
+
+         /*!
+         * Login to your application using Facebook.
+         * Uses the Facebook SDK for JavaScript available here:
+         * https://developers.facebook.com/docs/javascript/quickstart/
+         */
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: appId
+            });
+
+            FB.login(function (response) {
+                ec2.config.credentials = new AWS.WebIdentityCredentials({
+                    ProviderId: 'graph.facebook.com',
+                    RoleArn: roleArn,
+                    WebIdentityToken: response.authResponse.accessToken
+                });
+                fbUserId = response.authResponse.userID;
+                button.style.display = 'block';
+            })
+        };
+
+         // Load the Facebook SDK asynchronously
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://connect.facebook.net/en_US/all.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+</body>
+</html>
