@@ -8,7 +8,7 @@
 </div>
 	<meta charset="utf-8">
 	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.208.0.min.js"></script>
-
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
 	<p>Select Filters to get your ec2 graph :</p>
@@ -21,9 +21,11 @@
 			<input type="date" id="fromdate" name="fromdate" min="2017-01-01">
 			<label for="todate">To Date:</label>
 			<input type="date" id="todate" name="todate">
-			<div class = "css-button">
-			<input type="submit" id="sbmt" onclick="getDates(); return false;">
 		</div>
+		<div class = "css-button">
+			<input type="submit" id="sbmt" onclick="applyFilters(); return false;">
+		</div>
+		<div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
 </form>
 <script>
 AWS.config.update({
@@ -32,7 +34,9 @@ AWS.config.update({
 	secretAccessKey: "syYoklIpzbqaFzAqdRKxtXxmPUo49mB3S9Z4j0qZ"
 });
 var ec2 = new AWS.EC2();
-function getDates(){
+
+//var ec2DesribePromise = ec2.describeInstances(params).promise();
+function applyFilters(){
 		var listDate = [];
 		//demo1.innerHTML = '';
 		var startDate = document.getElementById("fromdate").value;
@@ -44,23 +48,35 @@ function getDates(){
 				listDate.push(strDate);
   			dateMove.setDate(dateMove.getDate()+1);
 		};
-		return listDate;
-	}
 
+
+		//alert(listDate);
 		var i = 0;
 		var instArray = [];
-		var dates = getDates();
-		var j = dates.length;
 
+		var j = listDate.length;
+		//alert(j);
 		while (i < j){
 
-
+			//alert(i);
+			//alert(listDate[i]);
 			var hourArray = [];
 			var d = dates[i];
 			i = i + 1;
 			for (var m = 0; m <= 2; m++) {
 				hourArray.push(d + 'T' + m + '*');
 			}
+
+
+
+			AWS.config.update({
+				region: "us-east-1",
+				accessKeyId: "AKIAI35YVDRTSJ47FJZA",
+				secretAccessKey: "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"
+			});
+
+			var ec2 = new AWS.EC2();
+
 			if (typeof Promise === 'undefined') {
 			  AWS.config.setPromisesDependency(require('bluebird'));
 			}
@@ -80,18 +96,14 @@ function getDates(){
 		describeInstances()
 			.then(function(data){
 				var no_of_inst = data.Reservations.length;
-
 				instArray.push(no_of_inst);
-				alert(hourArray+' '+instArray);
-
-
 			})
 			.catch(function(err) {
 				console.log(err);
 			});
 	}
 
-
+}
 </script>
 </body>
 </html>

@@ -3,47 +3,51 @@
 <head>
 	<title>Migration Status</title>
 	<!--<link rel="stylesheet" href="styles.css">-->
-<div>
+	<div>
 	<h3> M I G R A T I O N  -  S T A T U S </h3>
-</div>
+	</div>
 	<meta charset="utf-8">
 	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.208.0.min.js"></script>
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-
 </head>
+
 <body>
 	<p>Select Filters to get your ec2 graph :</p>
-<form>
+	<form>
 		<div class = "css-grid1">
 			<label> Launch-time: </label>
 		</div>
+
 		<div class = "css-inlineblock1">
 			<label for="fromdate">From Date:</label>
 			<input type="date" id="fromdate" name="fromdate" min="2017-01-01">
 			<label for="todate">To Date:</label>
 			<input type="date" id="todate" name="todate">
 		</div>
+
 		<div class = "css-button">
-			<input type="submit" id="sbmt" onclick="applyFilters(); return false;">
+			<input type="submit" id="sbmt" onclick="getDatesInstances()">
 		</div>
 
-		<div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+		<div id="myDiv" style="width: 500px; height: 500px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+	</form>
 
-</form>
 <script>
-var ec2 = new AWS.EC2();
-AWS.config.update({
-	region: "us-east-1",
-	accessKeyId: "AKIAI35YVDRTSJ47FJZA",
-	secretAccessKey: "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"
-});
-function applyFilters() {
+
+	var ec2 = new AWS.EC2();
+	AWS.config.update({
+		region: "us-east-1",
+		accessKeyId: "AKIAJCY75NFRZN5WU6TQ",
+		secretAccessKey: "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"
+	});
+
+	function getDates() {
 		var listDate = [];
 		//demo1.innerHTML = '';
 		var startDate = document.getElementById("fromdate").value;
 		var endDate = document.getElementById("todate").value;
-		
+		//alert(startDate);
+		//alert(endDate);
 		var dateMove = new Date(startDate);
 		var strDate = startDate;
 		while (strDate < endDate){
@@ -51,55 +55,63 @@ function applyFilters() {
 				listDate.push(strDate);
   			dateMove.setDate(dateMove.getDate()+1);
 		};
-		//alert(listDate);
-		//document.getElementById('demo1').innerHTML = "Your selected dates are";
-		//demo2.innerHTML += "<br>";
-		//document.getElementById('demo3').innerHTML = listDate;
-		//alert(listDate);
-		//var i = 0;
-		var j = listDate.length;
-		//alert(j);
+		return listDate;
+	}
+
+	function getInstances(dates) {
+		var j = dates.length;
 		var instArray = [];
-		//while (i < j){
-			for (var i = 0; i < j; i++) {
-			//alert(i);
-			//alert(listDate[i]);
+		for (var i = 0; i < j; i++) {
 			var hourArray = [];
-
-			var d = listDate[i];
-
+			var d = dates[i];
 			for (var m = 0; m <= 2; m++) {
 				hourArray.push(d + 'T' + m + '*');
 			}
-			//alert(hourArray);
+			alert(hourArray);
 			var ec2 = new AWS.EC2();
 			AWS.config.update({
 				region: "us-east-1",
-				accessKeyId: "AKIAI35YVDRTSJ47FJZA",
-				secretAccessKey: "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"
+				accessKeyId: "AKIAJCY75NFRZN5WU6TQ",
+				secretAccessKey: "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"
 			});
 
+			var describeInstances = function describeInstances() {
 			var params = {
 				Filters: [
-				{
-				Name: 'launch-time',
-				Values: hourArray
-				}]
+					{
+					Name: 'launch-time',
+					Values: hourArray
+					}]
+				};
+				alert(JSON.stringify(params.Filters));
+				return ec2.describeInstances(params).promise();
 			};
 
-			var resp = ec2.describeInstances(params).send(); null
-			alert(resp.data);
-			var no_of_inst = resp.data.Reservations.length;
-			instArray.push(no_of_inst);
-			var trace = {
-  				x: listDate,
+			describeInstances().then(function(data){
+				var no_of_inst = data.Reservations.length;
+				instArray.push(no_of_inst);
+				alert(dates+' '+instArray);
+				var trace2 = {
+  				x: dates,
   				y: instArray,
-  				type: 'line'
+  				type: 'bar'
 				};
-			Plotly.newPlot('myDiv', trace);
-		}
-			//i = i + 1;
-}
+				var ec2data = [trace2];
+				Plotly.newPlot('myDiv', ec2data);
+			})
+			.catch(function(err) {
+				console.log(err);
+			});
+	  }
+		
+  }
+
+	function getDatesInstances() {
+		var dates = getDates();
+		alert(dates);
+		getInstances(dates);
+	}
+
 </script>
 </body>
 </html>
