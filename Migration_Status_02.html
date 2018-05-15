@@ -61,7 +61,8 @@
 	function getInstances(dates) {
 		var j = dates.length;
 		var instArray = [];
-		for (var i = 0; i < j; i++) {
+		var count = 0;
+		for (var i = 0; i < j; ++i) {
 			var hourArray = [];
 			var d = dates[i];
 			for (var m = 0; m <= 2; m++) {
@@ -87,23 +88,28 @@
 				return ec2.describeInstances(params).promise();
 			};
 
-			describeInstances().then(function(data){
-				var no_of_inst = data.Reservations.length;
-				instArray.push(no_of_inst);
-				alert(dates+' '+instArray);
-				var trace2 = {
-  				x: dates,
-  				y: instArray,
-  				type: 'bar'
-				};
-				var ec2data = [trace2];
-				Plotly.newPlot('myDiv', ec2data);
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
+			describeInstances().then( (function(data){
+				return function() {
+					var no_of_inst = data.Reservations.length;
+					instArray.push(no_of_inst);
+					alert(dates+' '+instArray);
+					++count;
+					if ( count == j ) {
+						var trace2 = {
+		  				x: dates,
+		  				y: instArray,
+		  				type: 'bar'
+						};
+						var ec2data = [trace2];
+						Plotly.newPlot('myDiv', ec2data);
+					}
+				}
+			})() );
+			//.catch(function(err) {
+			//	console.log(err);
+			//});
 	  }
-		
+
   }
 
 	function getDatesInstances() {
