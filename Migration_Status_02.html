@@ -88,13 +88,13 @@
 				return ec2.describeInstances(params).promise();
 			};
 
-			describeInstances().then( (function(data){
-				return function() {
+			describeInstances().then(function(data){
+
 					var no_of_inst = data.Reservations.length;
 					instArray.push(no_of_inst);
 					alert(dates+' '+instArray);
 					++count;
-					if ( count == j ) {
+					if ( count == j-1 ) {
 						var trace2 = {
 		  				x: dates,
 		  				y: instArray,
@@ -103,8 +103,8 @@
 						var ec2data = [trace2];
 						Plotly.newPlot('myDiv', ec2data);
 					}
-				}
-			})() );
+				});
+
 			//.catch(function(err) {
 			//	console.log(err);
 			//});
